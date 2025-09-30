@@ -9,30 +9,51 @@ jobs:
   build_test_coverage:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
-      - run: dotnet restore
-      - run: dotnet build -c Release --no-restore
-      - run: dotnet test src/Fiap.Store.Tests -c Release --no-build --collect:"XPlat Code Coverage" --logger "trx;LogFileName=test_results.trx"
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build -c Release --no-restore
+
+      - name: Test with coverage
+        run: dotnet test src/Fiap.Store.Tests -c Release --no-build --collect:"XPlat Code Coverage" --logger "trx;LogFileName=test_results.trx"
 
       - name: Find coverage file
         id: cov
         shell: bash
         run: |
           FILE=$(find src/Fiap.Store.Tests/TestResults -name "coverage.cobertura.xml" | head -n 1)
-          echo "file=$FILE" >> $GITHUB_OUTPUT
+          echo "file=$FILE" >> "$GITHUB_OUTPUT"
+          echo "Found coverage at: $FILE"
 
       - name: Install reportgenerator
         run: dotnet tool install -g dotnet-reportgenerator-globaltool
 
       - name: Generate HTML report
-        env: { PATH: $PATH:~/.dotnet/tools }
-        run: reportgenerator -reports:"${{ steps.cov.outputs.file }}" -targetdir:"coverage-report" -reporttypes:"Html;Cobertura"
+        env:
+          PATH: $PATH:~/.dotnet/tools
+        run: |
+          reportgenerator \
+            -reports:"${{ steps.cov.outputs.file }}" \
+            -targetdir:"coverage-report" \
+            -reporttypes:"Html;Cobertura"
 
-      - uses: actions/upload-artifact@v4
-        with: { name: coverage-report, path: coverage-report }
-      - uses: actions/upload-artifact@v4
-        with: { name: coverage-cobertura, path: ${{ steps.cov.outputs.file }} }
+      - name: Upload coverage HTML
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage-report
+
+      - name: Upload raw cobertura XML
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-cobertura
+          path: ${{ steps.cov.outputs.file }}
