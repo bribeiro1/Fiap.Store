@@ -21,7 +21,7 @@ O projeto segue **DDD + Clean Architecture**:
   - Entidades ('Order', 'OrderItem')  
   - Value Objects  
   - Serviços de Domínio ('OrderService')  
-  - Contratos ('IOrderRepository')  
+  - Contratos ('IOrderRepository','IOrderService')  
 
 - **Fiap.Store.Application**  
   - Casos de uso (Commands/Handlers com MediatR)  
@@ -29,7 +29,7 @@ O projeto segue **DDD + Clean Architecture**:
   - DTOs para transporte  
 
 - **Fiap.Store.Infra**  
-  - Repositório InMemory ('OrderRepository','IOrderService')  
+  - Repositório InMemory ('OrderRepository')  
   - Implementa as interfaces do domínio  
 
 - **Fiap.Store.Api**  
