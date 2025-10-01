@@ -29,7 +29,7 @@ O projeto segue **DDD + Clean Architecture**:
   - DTOs para transporte  
 
 - **Fiap.Store.Infra**  
-  - Repositório InMemory ('OrderRepository')  
+  - Repositório InMemory ('OrderRepository','IOrderService')  
   - Implementa as interfaces do domínio  
 
 - **Fiap.Store.Api**  
